@@ -6,7 +6,13 @@ function Content(props) {
     const [state, setState] = useState({
       error: null,
       isLoaded: false,
-      albums: []
+      albums: [],
+    });
+
+    const [albumState, setAlbumState] = useState({
+        error: null,
+        isLoaded: false,
+        photos: [],
     });
 
     useEffect(() => {
@@ -58,10 +64,10 @@ function Content(props) {
       return <div>Loading...</div>;
     } else {
       return (
-        <ul className='albums' onClick={ clickHandler }>
+        <ul className='albums'>
           {
               albums.map(album => (
-              <li key={ album.id } className='albums__item' data-id={ album.id }>
+              <li key={ album.id } className='albums__item' onClick={ clickHandler } data-id={ album.id }>
                   Title - <span className='album__title'>{ album.title }</span>
               </li>
               ))
