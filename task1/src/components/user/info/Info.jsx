@@ -3,7 +3,6 @@ import React, { useState, useEffect } from 'react';
 import './info.scss';
 
 function Info(props) {
-    console.log(props);
     const { name, username, address, email, phone, website, company } = props.info;
     return (
         <div className="info">
