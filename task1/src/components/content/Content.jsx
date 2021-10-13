@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 
 import './content.scss';
+import Photos from './Photos/Photos';
 
 function Content(props) {
     const [state, setState] = useState({
@@ -9,12 +10,18 @@ function Content(props) {
       albums: []
     });
 
+    const [activeAlbum, setActiveAlbum] = useState({
+      albumId: undefined,
+      photos: [],
+      error: false,
+      isLoaded: false,
+    });
+
     useEffect(() => {
       fetch("https://jsonplaceholder.typicode.com/albums")
         .then(res => res.json())
         .then(
           (result) => {
-              console.log(result)
             setState({
               isLoaded: true,
               albums: result
@@ -30,27 +37,42 @@ function Content(props) {
     }, []);
 
     const clickHandler = useCallback((e) => {
-      const albumID = e.currentTarget.dataset.id;
-      fetch("https://jsonplaceholder.typicode.com/photos")
+      let li = e.target.closest('li');
+      console.log(li);
+      if (!li) return;
+      const albumID = li.dataset.id;
+      setActiveAlbum({
+        albumId: albumID,
+        photos: [],
+        isLoaded: false,
+        error: false,
+      });
+      fetch(`https://jsonplaceholder.typicode.com/albums/${albumID}/photos`)
         .then(res => res.json())
         .then(
           (result) => {
-              console.log(result)
-            setState({
+            setActiveAlbum({
+              albumId: albumID,
+              photos: result,
               isLoaded: true,
-              albums: result
+              error: false,
             });
           },
           (error) => {
-            setState({
+            setActiveAlbum({
+              albumId: undefined,
+              photos: undefined,
               isLoaded: true,
-              error
+              error,
             });
           }
         )
     }, []);
 
     const { error, isLoaded, albums } = state;
+    const photosError = activeAlbum.error;
+    const photosAreLoaded = activeAlbum.isLoaded;
+    const { photos, albumId } = activeAlbum;
 
     if (error) {
       return <div>Error: { error.message }</div>;
@@ -60,11 +82,33 @@ function Content(props) {
       return (
         <ul className='albums' onClick={ clickHandler }>
           {
-              albums.map(album => (
+            albums.map(album => (
               <li key={ album.id } className='albums__item' data-id={ album.id }>
-                  Title - <span className='album__title'>{ album.title }</span>
+                { console.log(album.id, albumId) }
+                {
+                  (albumId && albumId.toString() === album.id.toString()) &&
+                  (
+                    <div className='photos-container'>
+                      <Photos isLoaded={ photosAreLoaded } photos={photos} error={ photosError }  />
+                      <span className='backbtn' onClick={(e) => {
+                        e.stopPropagation();
+                        setActiveAlbum({
+                          albumId: undefined,
+                          isLoaded: false,
+                          photos: [],
+                          error: undefined,
+                        });
+                      }}>&#10006;</span>
+                    </div>
+                  )
+                }
+                {
+                  (!albumId || albumId.toString() !== album.id.toString()) &&
+                  <span className='album__title'>{ album.title }</span>
+                }
+                
               </li>
-              ))
+            ))
           }
         </ul>
       );
