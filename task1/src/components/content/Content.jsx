@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { useDispatch } from 'react-redux';
 
 import './content.scss';
 import Photos from './Photos/Photos';
@@ -9,6 +10,8 @@ function Content(props) {
       isLoaded: false,
       albums: []
     });
+
+    const dispatch = useDispatch();
 
     const [activeAlbum, setActiveAlbum] = useState({
       albumId: undefined,
@@ -38,7 +41,6 @@ function Content(props) {
 
     const clickHandler = useCallback((e) => {
       let li = e.target.closest('li');
-      console.log(li);
       if (!li) return;
       const albumID = li.dataset.id;
       setActiveAlbum({
@@ -69,6 +71,13 @@ function Content(props) {
         )
     }, []);
 
+    const addAlbum = useCallback((e) => {
+      const newAlbum = {
+        id: Date.now(),
+        title: 'New Album',
+      };
+    });
+
     const { error, isLoaded, albums } = state;
     const photosError = activeAlbum.error;
     const photosAreLoaded = activeAlbum.isLoaded;
@@ -80,37 +89,39 @@ function Content(props) {
       return <div>Loading...</div>;
     } else {
       return (
-        <ul className='albums' onClick={ clickHandler }>
-          {
-            albums.map(album => (
-              <li key={ album.id } className='albums__item' data-id={ album.id }>
-                { console.log(album.id, albumId) }
-                {
-                  (albumId && albumId.toString() === album.id.toString()) &&
-                  (
-                    <div className='photos-container'>
-                      <Photos isLoaded={ photosAreLoaded } photos={photos} error={ photosError }  />
-                      <span className='backbtn' onClick={(e) => {
-                        e.stopPropagation();
-                        setActiveAlbum({
-                          albumId: undefined,
-                          isLoaded: false,
-                          photos: [],
-                          error: undefined,
-                        });
-                      }}>&#10006;</span>
-                    </div>
-                  )
-                }
-                {
-                  (!albumId || albumId.toString() !== album.id.toString()) &&
-                  <span className='album__title'>{ album.title }</span>
-                }
-                
-              </li>
-            ))
-          }
-        </ul>
+        <div className="wrapper">
+          <div className="btn-add-album" onClick={ addAlbum }>Добавить альбом</div>
+          <ul className='albums' onClick={ clickHandler }>
+            {
+              albums.map(album => (
+                <li key={ album.id } className='albums__item' data-id={ album.id }>
+                  {
+                    (albumId && albumId.toString() === album.id.toString()) &&
+                    (
+                      <div className='photos-container'>
+                        <Photos isLoaded={ photosAreLoaded } photos={photos} error={ photosError }  />
+                        <span className='backbtn' onClick={(e) => {
+                          e.stopPropagation();
+                          setActiveAlbum({
+                            albumId: undefined,
+                            isLoaded: false,
+                            photos: [],
+                            error: undefined,
+                          });
+                        }}>&#10006;</span>
+                      </div>
+                    )
+                  }
+                  {
+                    (!albumId || albumId.toString() !== album.id.toString()) &&
+                    <span className='album__title'>{ album.title }</span>
+                  }
+                  
+                </li>
+              ))
+            }
+          </ul>
+        </div>
       );
     }
 }
