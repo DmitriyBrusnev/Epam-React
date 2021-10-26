@@ -66,7 +66,14 @@ function Content(props) {
               error,
             });
           }
-        )
+        ).catch(error => {
+          setActiveAlbum({
+            albumId: undefined,
+            photos: undefined,
+            isLoaded: true,
+            error,
+          });
+        });
     }, []);
 
     const { error, isLoaded, albums } = state;
