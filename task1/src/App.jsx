@@ -2,10 +2,13 @@ import React, { useState, useEffect } from 'react';
 import Content from './components/content/Content';
 import Details from './components/user/Details';
 import { Provider } from 'react-redux';
-import { createStore } from 'redux';
+import { applyMiddleware, createStore } from 'redux';
 import rootReducer from './redux/reducer/rootReducer';
+import thunk from 'redux-thunk';
 
-const store = createStore(rootReducer);
+const store = createStore(rootReducer, applyMiddleware(thunk));
+
+console.log(store.getState());
 
 function App(props) {
   return (

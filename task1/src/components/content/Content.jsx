@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
 import './content.scss';
 import Photos from './Photos/Photos';
@@ -8,7 +8,8 @@ function Content(props) {
     const [state, setState] = useState({
       error: null,
       isLoaded: false,
-      albums: []
+      albums: [],
+      additionalAlbums: [],
     });
 
     const dispatch = useDispatch();
@@ -25,16 +26,18 @@ function Content(props) {
         .then(res => res.json())
         .then(
           (result) => {
-            setState({
-              isLoaded: true,
-              albums: result
-            });
+            // setState((prevState) => ({
+            //   ...prevState,
+            //   isLoaded: true,
+            //   albums: result
+            // }));
           },
           (error) => {
-            setState({
-              isLoaded: true,
-              error
-            });
+            // setState((prevState) => ({
+            //   ...prevState,
+            //   isLoaded: true,
+            //   error
+            // }));
           }
         )
     }, []);
@@ -76,9 +79,28 @@ function Content(props) {
         id: Date.now(),
         title: 'New Album',
       };
+
+      dispatch(addAlbum(newAlbum));
+
+      // fetch('https://jsonplaceholder.typicode.com/albums', {
+      //   method: 'POST',
+      //   body: JSON.stringify(newAlbum),
+      //   headers: {
+      //     'Content-type': 'application/json; charset=UTF-8',
+      //   },
+      // })
+      //   .then((response) => response.json())
+      //   .then(() => {
+      //     setState((prevState) => ({
+      //       ...prevState,
+      //       additionalAlbums: prevState.additionalAlbums.concat([newAlbum]),
+      //     }));
+      //   });
     });
 
-    const { error, isLoaded, albums } = state;
+    const albulRedux = useSelector((state) => state.albums);
+
+    const { error, isLoaded, albums, additionalAlbums } = state;
     const photosError = activeAlbum.error;
     const photosAreLoaded = activeAlbum.isLoaded;
     const { photos, albumId } = activeAlbum;
@@ -93,7 +115,7 @@ function Content(props) {
           <div className="btn-add-album" onClick={ addAlbum }>Добавить альбом</div>
           <ul className='albums' onClick={ clickHandler }>
             {
-              albums.map(album => (
+              additionalAlbums.concat(albums).map(album => (
                 <li key={ album.id } className='albums__item' data-id={ album.id }>
                   {
                     (albumId && albumId.toString() === album.id.toString()) &&
