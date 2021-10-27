@@ -28,24 +28,6 @@ function Content(props) {
 
     useEffect(() => {
       dispatch(getAlbums());
-      // fetch("https://jsonplaceholder.typicode.com/albums")
-      //   .then(res => res.json())
-      //   .then(
-      //     (result) => {
-      //       // setState((prevState) => ({
-      //       //   ...prevState,
-      //       //   isLoaded: true,
-      //       //   albums: result
-      //       // }));
-      //     },
-      //     (error) => {
-      //       // setState((prevState) => ({
-      //       //   ...prevState,
-      //       //   isLoaded: true,
-      //       //   error
-      //       // }));
-      //     }
-      //   )
     }, [dispatch]);
 
     const clickHandler = useCallback((e) => {
