@@ -1,46 +1,52 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { addAlbum, getAlbums } from '../../redux/actions/albums';
 
 import './content.scss';
 import Photos from './Photos/Photos';
 
 function Content(props) {
-    const [state, setState] = useState({
-      error: null,
-      isLoaded: false,
-      albums: [],
-      additionalAlbums: [],
-    });
+    // const [state, setState] = useState({
+    //   error: null,
+    //   isLoaded: false,
+    //   albums: [],
+    //   additionalAlbums: [],
+    // });
+
+    const albumsInfo = useSelector((state) => state.albums);
+
+    console.log('rerender');
 
     const dispatch = useDispatch();
 
-    const [activeAlbum, setActiveAlbum] = useState({
-      albumId: undefined,
-      photos: [],
-      error: false,
-      isLoaded: false,
-    });
+    // const [activeAlbum, setActiveAlbum] = useState({
+    //   albumId: undefined,
+    //   photos: [],
+    //   error: false,
+    //   isLoaded: false,
+    // });
 
     useEffect(() => {
-      fetch("https://jsonplaceholder.typicode.com/albums")
-        .then(res => res.json())
-        .then(
-          (result) => {
-            // setState((prevState) => ({
-            //   ...prevState,
-            //   isLoaded: true,
-            //   albums: result
-            // }));
-          },
-          (error) => {
-            // setState((prevState) => ({
-            //   ...prevState,
-            //   isLoaded: true,
-            //   error
-            // }));
-          }
-        )
-    }, []);
+      dispatch(getAlbums());
+      // fetch("https://jsonplaceholder.typicode.com/albums")
+      //   .then(res => res.json())
+      //   .then(
+      //     (result) => {
+      //       // setState((prevState) => ({
+      //       //   ...prevState,
+      //       //   isLoaded: true,
+      //       //   albums: result
+      //       // }));
+      //     },
+      //     (error) => {
+      //       // setState((prevState) => ({
+      //       //   ...prevState,
+      //       //   isLoaded: true,
+      //       //   error
+      //       // }));
+      //     }
+      //   )
+    }, [dispatch]);
 
     const clickHandler = useCallback((e) => {
       let li = e.target.closest('li');
@@ -74,45 +80,29 @@ function Content(props) {
         )
     }, []);
 
-    const addAlbum = useCallback((e) => {
+    const addAlbumHandler = useCallback((e) => {
       const newAlbum = {
         id: Date.now(),
         title: 'New Album',
       };
 
       dispatch(addAlbum(newAlbum));
+    }, [dispatch]);
 
-      // fetch('https://jsonplaceholder.typicode.com/albums', {
-      //   method: 'POST',
-      //   body: JSON.stringify(newAlbum),
-      //   headers: {
-      //     'Content-type': 'application/json; charset=UTF-8',
-      //   },
-      // })
-      //   .then((response) => response.json())
-      //   .then(() => {
-      //     setState((prevState) => ({
-      //       ...prevState,
-      //       additionalAlbums: prevState.additionalAlbums.concat([newAlbum]),
-      //     }));
-      //   });
-    });
+    const { albums, albumsLoaded, albumAdded, additionalAlbums, albumsLoadError, activeAlbumInfo } = albumsInfo;
 
-    const albulRedux = useSelector((state) => state.albums);
-
-    const { error, isLoaded, albums, additionalAlbums } = state;
-    const photosError = activeAlbum.error;
-    const photosAreLoaded = activeAlbum.isLoaded;
-    const { photos, albumId } = activeAlbum;
+    // const photosError = activeAlbum.error;
+    // const photosAreLoaded = activeAlbum.isLoaded;
+    const { photos, albumId } = activeAlbumInfo;
 
     if (error) {
-      return <div>Error: { error.message }</div>;
-    } else if (!isLoaded) {
+      return <div>Error: { albumsLoadError.message }</div>;
+    } else if (!albumsLoaded) {
       return <div>Loading...</div>;
     } else {
       return (
         <div className="wrapper">
-          <div className="btn-add-album" onClick={ addAlbum }>Добавить альбом</div>
+          <div className={ "btn-add-album " + (!albumAdded ? 'disabled' : '') } onClick={ addAlbumHandler }>Добавить альбом</div>
           <ul className='albums' onClick={ clickHandler }>
             {
               additionalAlbums.concat(albums).map(album => (
@@ -121,15 +111,15 @@ function Content(props) {
                     (albumId && albumId.toString() === album.id.toString()) &&
                     (
                       <div className='photos-container'>
-                        <Photos isLoaded={ photosAreLoaded } photos={photos} error={ photosError }  />
+                        <Photos isLoaded={ photosAreLoaded } photos={ photos } error={ photosError }  />
                         <span className='backbtn' onClick={(e) => {
                           e.stopPropagation();
-                          setActiveAlbum({
-                            albumId: undefined,
-                            isLoaded: false,
-                            photos: [],
-                            error: undefined,
-                          });
+                          // setActiveAlbum({
+                          //   albumId: undefined,
+                          //   isLoaded: false,
+                          //   photos: [],
+                          //   error: undefined,
+                          // });
                         }}>&#10006;</span>
                       </div>
                     )

@@ -1,9 +1,41 @@
-import { ADD_ALBUM_FAILURE, ADD_ALBUM_STARTED, ADD_ALBUM_SUCCESS, SET_ALBUMS } from "../const/const";
+import { ADD_ALBUM_FAILURE, ADD_ALBUM_STARTED, ADD_ALBUM_SUCCESS, GET_ALBUMS_FAILURE, GET_ALBUMS_STARTED, GET_ALBUMS_SUCCESS, SET_ALBUMS } from "../const/const";
 
-export const setAlbums = (albums) => ({
-    type: SET_ALBUMS,
+// get albums actions
+
+export const getAlbums = () => {
+    return (dispatch) => {
+        dispatch(getAlbumsStarted());
+
+        fetch("https://jsonplaceholder.typicode.com/albums")
+            .then(res => res.json())
+            .then(
+                (result) => {
+                    dispatch(getAlbumsSuccess(result));
+                },
+                (error) => {
+                    dispatch(getAlbumsFailure(error));
+                }
+            ).catch((error) => {
+                dispatch(getAlbumsFailure(error));
+            });
+    }
+};
+
+const getAlbumsStarted = () => ({
+    type: GET_ALBUMS_STARTED,
+})
+
+const getAlbumsSuccess = (albums) => ({
+    type: GET_ALBUMS_SUCCESS,
     payload: albums,
-});
+})
+
+const getAlbumsFailure = (error) => ({
+    type: GET_ALBUMS_FAILURE,
+    payload: error,
+})
+
+// add album actions
 
 export const addAlbum = ({ id, title }) => {
     return (dispatch) => {
@@ -21,10 +53,10 @@ export const addAlbum = ({ id, title }) => {
             .then((response) => response.json())
             .then(() => {
                 dispatch(addAlbumSuccess(newAlbum));
-                setState((prevState) => ({
-                    ...prevState,
-                    additionalAlbums: prevState.additionalAlbums.concat([newAlbum]),
-                }));
+                // setState((prevState) => ({
+                //     ...prevState,
+                //     additionalAlbums: prevState.additionalAlbums.concat([newAlbum]),
+                // }));
             })
             .catch((error) => {
                 dispatch(addAlbumFailure(error));
