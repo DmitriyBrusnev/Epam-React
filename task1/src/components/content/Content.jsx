@@ -1,123 +1,76 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { addAlbum, getAlbums } from '../../redux/actions/albums';
+import { addAlbum, getAlbums, setActiveAlbum } from '../../redux/actions/albums';
+import { getAlbumPhotos } from '../../redux/actions/photos';
 
 import './content.scss';
 import Photos from './Photos/Photos';
 
 function Content(props) {
-    // const [state, setState] = useState({
-    //   error: null,
-    //   isLoaded: false,
-    //   albums: [],
-    //   additionalAlbums: [],
-    // });
+  const dispatch = useDispatch();
+  
+  const albumsInfo = useSelector((state) => state.albums);
+  const photosInfo = useSelector((state) => state.photos);
 
-    const albumsInfo = useSelector((state) => state.albums);
+  useEffect(() => {
+    dispatch(getAlbums());
+  }, [dispatch]);
 
-    console.log('rerender');
+  const showAlbumPhotosHandler = useCallback((e) => {
+    let li = e.target.closest('li');
+    if (!li) return;
+    const albumId = li.dataset.id;
+    dispatch(getAlbumPhotos(albumId));
+  }, []);
 
-    const dispatch = useDispatch();
+  const addAlbumHandler = useCallback((e) => {
+    const newAlbum = {
+      id: Date.now(),
+      title: 'New Album',
+    };
 
-    // const [activeAlbum, setActiveAlbum] = useState({
-    //   albumId: undefined,
-    //   photos: [],
-    //   error: false,
-    //   isLoaded: false,
-    // });
+    dispatch(addAlbum(newAlbum));
+  }, [dispatch]);
 
-    useEffect(() => {
-      dispatch(getAlbums());
-    }, [dispatch]);
+  const { albums, albumsLoaded, albumAdded, additionalAlbums, albumsLoadError, activeAlbumInfo } = albumsInfo;
+  const { photosLoaded, photosLoadError } = photosInfo;
+  const { photos, albumId } = activeAlbumInfo;
 
-    const clickHandler = useCallback((e) => {
-      let li = e.target.closest('li');
-      if (!li) return;
-      const albumID = li.dataset.id;
-      setActiveAlbum({
-        albumId: albumID,
-        photos: [],
-        isLoaded: false,
-        error: false,
-      });
-      fetch(`https://jsonplaceholder.typicode.com/albums/${albumID}/photos`)
-        .then(res => res.json())
-        .then(
-          (result) => {
-            setActiveAlbum({
-              albumId: albumID,
-              photos: result,
-              isLoaded: true,
-              error: false,
-            });
-          },
-          (error) => {
-            setActiveAlbum({
-              albumId: undefined,
-              photos: undefined,
-              isLoaded: true,
-              error,
-            });
+  if (albumsLoadError) {
+    return <div>Error: { albumsLoadError.message }</div>;
+  } else if (!albumsLoaded) {
+    return <div>Loading...</div>;
+  } else {
+    return (
+      <div className="wrapper">
+        <div className={ "btn-add-album " + (!albumAdded ? 'disabled' : '') } onClick={ addAlbumHandler }>Добавить альбом</div>
+        <ul className='albums' onClick={ showAlbumPhotosHandler }>
+          {
+            additionalAlbums.concat(albums).map(album => (
+              <li key={ album.id } className='albums__item' data-id={ album.id }>
+                {
+                  (albumId && albumId.toString() === album.id.toString()) &&
+                  (
+                    <div className='photos-container'>
+                      <Photos isLoaded={ photosLoaded } photos={ photos } error={ photosLoadError }  />
+                      <span className='backbtn' onClick={(e) => {
+                        e.stopPropagation();
+                        dispatch(setActiveAlbum({ albumId: null, photos: [] }));
+                      }}>&#10006;</span>
+                    </div>
+                  )
+                }
+                {
+                  (!albumId || albumId.toString() !== album.id.toString()) &&
+                  <span className='album__title'>{ album.title }</span>
+                }  
+              </li>
+            ))
           }
-        )
-    }, []);
-
-    const addAlbumHandler = useCallback((e) => {
-      const newAlbum = {
-        id: Date.now(),
-        title: 'New Album',
-      };
-
-      dispatch(addAlbum(newAlbum));
-    }, [dispatch]);
-
-    const { albums, albumsLoaded, albumAdded, additionalAlbums, albumsLoadError, activeAlbumInfo } = albumsInfo;
-
-    // const photosError = activeAlbum.error;
-    // const photosAreLoaded = activeAlbum.isLoaded;
-    const { photos, albumId } = activeAlbumInfo;
-
-    if (error) {
-      return <div>Error: { albumsLoadError.message }</div>;
-    } else if (!albumsLoaded) {
-      return <div>Loading...</div>;
-    } else {
-      return (
-        <div className="wrapper">
-          <div className={ "btn-add-album " + (!albumAdded ? 'disabled' : '') } onClick={ addAlbumHandler }>Добавить альбом</div>
-          <ul className='albums' onClick={ clickHandler }>
-            {
-              additionalAlbums.concat(albums).map(album => (
-                <li key={ album.id } className='albums__item' data-id={ album.id }>
-                  {
-                    (albumId && albumId.toString() === album.id.toString()) &&
-                    (
-                      <div className='photos-container'>
-                        <Photos isLoaded={ photosAreLoaded } photos={ photos } error={ photosError }  />
-                        <span className='backbtn' onClick={(e) => {
-                          e.stopPropagation();
-                          // setActiveAlbum({
-                          //   albumId: undefined,
-                          //   isLoaded: false,
-                          //   photos: [],
-                          //   error: undefined,
-                          // });
-                        }}>&#10006;</span>
-                      </div>
-                    )
-                  }
-                  {
-                    (!albumId || albumId.toString() !== album.id.toString()) &&
-                    <span className='album__title'>{ album.title }</span>
-                  }
-                  
-                </li>
-              ))
-            }
-          </ul>
-        </div>
-      );
-    }
+        </ul>
+      </div>
+    );
+  }
 }
 
 export default Content;

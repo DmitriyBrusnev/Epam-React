@@ -1,11 +1,12 @@
-import { ADD_ALBUM_FAILURE, ADD_ALBUM_STARTED, ADD_ALBUM_SUCCESS, GET_ALBUMS_FAILURE, GET_ALBUMS_STARTED, GET_ALBUMS_SUCCESS, SET_ALBUMS } from "../const/const";
+import { ADD_ALBUM_FAILURE, ADD_ALBUM_STARTED, ADD_ALBUM_SUCCESS, GET_ALBUMS_FAILURE, GET_ALBUMS_STARTED, GET_ALBUMS_SUCCESS, SET_ACTIVE_ALBUM, SET_ALBUMS } from "../const/const";
 
 const initialState = {
     albums: [],
     albumsLoaded: true,
     albumAdded: true,
     additionalAlbums: [],
-    error: null,
+    albumsLoadError: null,
+    addAlbumError: null,
     activeAlbumInfo: { albumId: null, photos: [] },
 }
 
@@ -27,7 +28,7 @@ export default function albumReducer(state = initialState, action) {
             return {
                 ...state,
                 albumsLoaded: true,
-                error,
+                albumsLoadError: action.payload,
             };
 
         // add albums reducers
@@ -46,8 +47,16 @@ export default function albumReducer(state = initialState, action) {
             return {
                 ...state,
                 albumAdded: true,
-                error,
+                addAlbumError,
             };
+
+        // set active album reducer
+        case SET_ACTIVE_ALBUM:
+            return {
+                ...state,
+                activeAlbumInfo: action.payload,
+            }
+
         default:
             return state;
     }

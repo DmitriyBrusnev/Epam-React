@@ -1,4 +1,4 @@
-import { ADD_ALBUM_FAILURE, ADD_ALBUM_STARTED, ADD_ALBUM_SUCCESS, GET_ALBUMS_FAILURE, GET_ALBUMS_STARTED, GET_ALBUMS_SUCCESS, SET_ALBUMS } from "../const/const";
+import { ADD_ALBUM_FAILURE, ADD_ALBUM_STARTED, ADD_ALBUM_SUCCESS, GET_ALBUMS_FAILURE, GET_ALBUMS_STARTED, GET_ALBUMS_SUCCESS, SET_ACTIVE_ALBUM, SET_ALBUMS } from "../const/const";
 
 // get albums actions
 
@@ -53,10 +53,6 @@ export const addAlbum = ({ id, title }) => {
             .then((response) => response.json())
             .then(() => {
                 dispatch(addAlbumSuccess(newAlbum));
-                // setState((prevState) => ({
-                //     ...prevState,
-                //     additionalAlbums: prevState.additionalAlbums.concat([newAlbum]),
-                // }));
             })
             .catch((error) => {
                 dispatch(addAlbumFailure(error));
@@ -76,4 +72,11 @@ const addAlbumSuccess = (album) => ({
 const addAlbumFailure = (error) => ({
     type: ADD_ALBUM_FAILURE,
     payload: error,
+})
+
+// set active album
+
+export const setActiveAlbum = ({ albumId, photos }) => ({
+    type: SET_ACTIVE_ALBUM,
+    payload: { albumId, photos },
 })
