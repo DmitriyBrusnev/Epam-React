@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
+import { useSelector } from 'react-redux';
 
 import './info.scss';
 
 function Info(props) {
-    const { name, username, address, email, phone, website, company } = props.info;
+    const { name, username, address, email, phone, website, company } = useSelector((state) => state.user);
+
     return (
         <div className="info">
             <div className="tabs">

@@ -15,7 +15,7 @@ function Photos(props) {
         {
           Array.from(photos).map(photo => (
             <span key={ photo.id } className='photo__item'>
-                <img src={ photo.url } alt="photo" />
+              <img src={ photo.url } alt="photo" />
             </span>
           ))
         }
