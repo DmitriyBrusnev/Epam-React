@@ -1,12 +1,15 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { addAlbum, getAlbums, setActiveAlbum } from '../../redux/actions/albums';
 import { addAlbumPhoto, getAlbumPhotos } from '../../redux/actions/photos';
 
 import './content.scss';
 import Photos from './Photos/Photos';
+import Modal from '../modal/Modal';
 
 function Content(props) {
+  const [ isModalOpen, setIsModalOpen ] = useState(true);
+
   const dispatch = useDispatch();
   
   const albumsInfo = useSelector((state) => state.albums);
@@ -23,13 +26,17 @@ function Content(props) {
     dispatch(getAlbumPhotos(albumId));
   }, []);
 
+  const albumTitleInput = useRef(null);
+
   const addAlbumHandler = useCallback((e) => {
     const newAlbum = {
       id: Date.now(),
-      title: 'New Album',
+      title: albumTitleInput.current.value,
     };
 
     dispatch(addAlbum(newAlbum));
+
+    setIsModalOpen(false);
   }, [dispatch]);
 
   const addPhotoToAlbumHandler = useCallback((e) => {
@@ -58,7 +65,13 @@ function Content(props) {
   } else {
     return (
       <div className="wrapper">
-        <div className={ "btn-add-album " + (!albumAdded ? 'disabled' : '') } onClick={ albumAdded ? addAlbumHandler : null }>Добавить альбом</div>
+        <Modal open={ isModalOpen } title="Album" onClose={ () => { setIsModalOpen(false); } } okHandler={ addAlbumHandler } >
+          <div className="title-container">
+            <label htmlFor="album-title">Title:</label>
+            <input type="text" id="album-title" ref={ albumTitleInput } />
+          </div>
+        </Modal>
+        <div className={ "btn-add-album " + (!albumAdded ? 'disabled' : '') } onClick={ albumAdded ? () => { setIsModalOpen(true); } : null }>Добавить альбом</div>
         <ul className='albums' onClick={ showAlbumPhotosHandler }>
           {
             additionalAlbums.concat(albums).map(album => (
@@ -69,7 +82,9 @@ function Content(props) {
                     <div className='photos-container'>
                       <Photos isLoaded={ photosLoaded } photos={ photos.concat(activeAlbomAdditionalPhotos) } error={ photosLoadError }  />
                       <div className="buttons">
-                        <span className='btn-add-photo' onClick={ addPhotoToAlbumHandler }><img className="icon-add-photo" src="./public/img/addPhoto.png" alt="" /></span>
+                        <span className='btn-add-photo' onClick={ addPhotoToAlbumHandler }>
+                          <img className="icon-add-photo" src="./public/img/addPhoto.png" alt="" />
+                        </span>
                         <span className='backbtn' onClick={(e) => {
                           e.stopPropagation();
                           dispatch(setActiveAlbum({ albumId: null, photos: [] }));
