@@ -8,7 +8,7 @@ import Photos from './Photos/Photos';
 import Modal from '../modal/Modal';
 
 function Content(props) {
-  const [ isModalOpen, setIsModalOpen ] = useState(true);
+  const [ modalInfo, setModalInfo ] = useState({ isOpen: false, content: (<div></div>), title: 'Album', okHandler: () => { /** */ } });
 
   const dispatch = useDispatch();
   
@@ -27,6 +27,7 @@ function Content(props) {
   }, []);
 
   const albumTitleInput = useRef(null);
+  const photoInfoInput = useRef(null);
 
   const addAlbumHandler = useCallback((e) => {
     const newAlbum = {
@@ -36,20 +37,25 @@ function Content(props) {
 
     dispatch(addAlbum(newAlbum));
 
-    setIsModalOpen(false);
+    setModalInfo((prev) => ({
+      ...prev,
+      isOpen: false,
+    }));
   }, [dispatch]);
 
   const addPhotoToAlbumHandler = useCallback((e) => {
-    e.stopPropagation();
-    let li = e.target.closest('li');
-    if (!li) return;
-    const albumId = li.dataset.id;
     const newPhoto = {
       id: Date.now(),
       albumId,
-      url: './public/img/photo.png',
+      url: `/public/img/${photoInfoInput.current.files[0].name}`,
     };
+
     dispatch(addAlbumPhoto(newPhoto));
+
+    setModalInfo((prev) => ({
+      ...prev,
+      isOpen: false,
+    }));
   });
 
   const { albums, albumsLoaded, albumAdded, additionalAlbums, albumsLoadError, activeAlbumInfo } = albumsInfo;
@@ -65,13 +71,23 @@ function Content(props) {
   } else {
     return (
       <div className="wrapper">
-        <Modal open={ isModalOpen } title="Album" onClose={ () => { setIsModalOpen(false); } } okHandler={ addAlbumHandler } >
-          <div className="title-container">
-            <label htmlFor="album-title">Title:</label>
-            <input type="text" id="album-title" ref={ albumTitleInput } />
-          </div>
+        <Modal open={ modalInfo.isOpen } title={ modalInfo.title } onClose={ () => { setModalInfo((prev) => ({ ...prev, isOpen: false, })); } } okHandler={ modalInfo.okHandler } >
+          { modalInfo.content }
         </Modal>
-        <div className={ "btn-add-album " + (!albumAdded ? 'disabled' : '') } onClick={ albumAdded ? () => { setIsModalOpen(true); } : null }>Добавить альбом</div>
+        <div className={ "btn-add-album " + (!albumAdded ? 'disabled' : '') } onClick={ albumAdded ? () => {
+          setModalInfo((prev) => ({
+            ...prev,
+            okHandler: addAlbumHandler,
+            isOpen: true,
+            content: (
+              <div className="title-container">
+                <label htmlFor="album-title">Title:</label>
+                <input type="text" id="album-title" ref={ albumTitleInput } />
+              </div>
+            ),
+            title: 'Album',
+          }));
+        } : null }>Добавить альбом</div>
         <ul className='albums' onClick={ showAlbumPhotosHandler }>
           {
             additionalAlbums.concat(albums).map(album => (
@@ -82,12 +98,25 @@ function Content(props) {
                     <div className='photos-container'>
                       <Photos isLoaded={ photosLoaded } photos={ photos.concat(activeAlbomAdditionalPhotos) } error={ photosLoadError }  />
                       <div className="buttons">
-                        <span className='btn-add-photo' onClick={ addPhotoToAlbumHandler }>
+                        <span className='btn-add-photo' onClick={ (e) => {
+                          e.stopPropagation();
+                          setModalInfo((prev) => ({
+                            ...prev,
+                            okHandler: addPhotoToAlbumHandler,
+                            isOpen: true,
+                            content: (
+                              <div className="photo-container">
+                                <input type="file" id="photo-info" ref={ photoInfoInput } />
+                              </div>
+                            ),
+                            title: 'Image'
+                          }));
+                        } }>
                           <img className="icon-add-photo" src="./public/img/addPhoto.png" alt="" />
                         </span>
                         <span className='backbtn' onClick={(e) => {
                           e.stopPropagation();
-                          dispatch(setActiveAlbum({ albumId: null, photos: [] }));
+                          dispatch(setActiveAlbum({ albumId: null }));
                         }}>&#10006;</span>
                       </div>
                     </div>

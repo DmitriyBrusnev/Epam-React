@@ -5,17 +5,20 @@ import { Provider } from 'react-redux';
 import { applyMiddleware, createStore } from 'redux';
 import rootReducer from './redux/reducer/rootReducer';
 import thunk from 'redux-thunk';
+import { ErrorBoundary } from './components/error/ErrorBoundary.jsx';
 
 const store = createStore(rootReducer, applyMiddleware(thunk));
 
 function App(props) {
   return (
-    <Provider store={ store }>
-      <div className="container">
-        <Details { ...props } />
-        <Content />
-      </div>
-    </Provider>
+    <ErrorBoundary>
+      <Provider store={ store }>
+        <div className="container">
+          <Details { ...props } />
+          <Content />
+        </div>
+      </Provider>
+    </ErrorBoundary>
   );
 }
 
