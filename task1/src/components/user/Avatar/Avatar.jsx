@@ -5,7 +5,7 @@ import './avatar.scss';
 function Avatar(props) {
   return (
     <div className="avatar">
-        <img src="/public/img/avatar.jpg" alt="" />
+        <img src="/public/img/avatar.jpg" alt="avatar" />
     </div>
   );
 }
