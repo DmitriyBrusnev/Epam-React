@@ -6,18 +6,30 @@ import { addAlbumPhoto, getAlbumPhotos } from '../../redux/actions/photos';
 import './content.scss';
 import Photos from './Photos/Photos';
 import Modal from '../modal/Modal';
+import { useParams } from 'react-router';
+import { Link } from 'react-router-dom';
 
 function Content(props) {
   const [ modalInfo, setModalInfo ] = useState({ isOpen: false, content: (<div></div>), title: 'Album', okHandler: () => { /** */ } });
+
+  const urlParams = useParams();
+  console.log('params', urlParams);
 
   const dispatch = useDispatch();
   
   const albumsInfo = useSelector((state) => state.albums);
   const photosInfo = useSelector((state) => state.photos);
+  const userInfo = useSelector((state) => state.user);
 
   useEffect(() => {
     dispatch(getAlbums());
   }, [dispatch]);
+
+  useEffect(() => {
+    if (urlParams.albumId) {
+      dispatch(getAlbumPhotos(urlParams.albumId));
+    }
+  }, [urlParams.albumId]);
 
   const showAlbumPhotosHandler = useCallback((e) => {
     let li = e.target.closest('li');
@@ -88,44 +100,48 @@ function Content(props) {
             title: 'Album',
           }));
         } : null }>Добавить альбом</div>
-        <ul className='albums' onClick={ showAlbumPhotosHandler }>
+        <ul className='albums' >
+        {/* onClick={ showAlbumPhotosHandler } */}
           {
-            additionalAlbums.concat(albums).map(album => (
+            additionalAlbums.concat(albums).filter((el) => urlParams.userId ? urlParams.userId.toString() === el.userId.toString() : true).map(album => (
               <li key={ album.id } className='albums__item' data-id={ album.id }>
-                {
-                  (albumId && albumId.toString() === album.id.toString()) &&
-                  (
-                    <div className='photos-container'>
-                      <Photos isLoaded={ photosLoaded } photos={ photos.concat(activeAlbomAdditionalPhotos) } error={ photosLoadError }  />
-                      <div className="buttons">
-                        <span className='btn-add-photo' onClick={ (e) => {
-                          e.stopPropagation();
-                          setModalInfo((prev) => ({
-                            ...prev,
-                            okHandler: addPhotoToAlbumHandler,
-                            isOpen: true,
-                            content: (
-                              <div className="photo-container">
-                                <input type="file" id="photo-info" ref={ photoInfoInput } />
-                              </div>
-                            ),
-                            title: 'Image'
-                          }));
-                        } }>
-                          <img className="icon-add-photo" src="./public/img/addPhoto.png" alt="" />
-                        </span>
-                        <span className='backbtn' onClick={(e) => {
-                          e.stopPropagation();
-                          dispatch(setActiveAlbum({ albumId: null }));
-                        }}>&#10006;</span>
+                  {
+                    (albumId && albumId.toString() === album.id.toString()) &&
+                    (
+                      <div className='photos-container'>
+                        <Photos isLoaded={ photosLoaded } photos={ photos.concat(activeAlbomAdditionalPhotos) } error={ photosLoadError }  />
+                        <div className="buttons">
+                          <span className='btn-add-photo' onClick={ (e) => {
+                            e.stopPropagation();
+                            setModalInfo((prev) => ({
+                              ...prev,
+                              okHandler: addPhotoToAlbumHandler,
+                              isOpen: true,
+                              content: (
+                                <div className="photo-container">
+                                  <input type="file" id="photo-info" ref={ photoInfoInput } />
+                                </div>
+                              ),
+                              title: 'Image'
+                            }));
+                          } }>
+                            <img className="icon-add-photo" src="/public/img/addPhoto.png" alt="" />
+                          </span>
+                          <Link to={urlParams.userId ? `/user/${urlParams.userId}/albums` : `/albums`}>
+                            <span className='backbtn' onClick={(e) => {
+                              dispatch(setActiveAlbum({ albumId: null }));
+                            }}>&#10006;</span>
+                          </Link>
+                        </div>
                       </div>
-                    </div>
-                  )
-                }
-                {
-                  (!albumId || albumId.toString() !== album.id.toString()) &&
-                  <span className='album__title'>{ album.title }</span>
-                }  
+                    )
+                  }
+                  {
+                    (!albumId || albumId.toString() !== album.id.toString()) &&
+                    <Link to={urlParams.userId ? `/user/${urlParams.userId}/albums/${album.id}` : `/albums/${album.id}`}>
+                      <span className='album__title'>{ album.title }</span>
+                    </Link>
+                  }
               </li>
             ))
           }

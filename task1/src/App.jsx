@@ -25,8 +25,12 @@ function App(props) {
             <Route path="/login" exact>
               <Login />
             </Route>
-            <Details { ...props } />
-            <Content />
+            <Route path={['/user/:userId', '/', 'home', '/user/:userId/albums/:albumId', '/user/:userId/albums']} exact >
+              <Details { ...props } />
+            </Route>
+            <Route path={['/albums', '/albums/:albumId', '/user/:userId/albums/:albumId', '/user/:userId/albums']} exact >
+              <Content />
+            </Route>
           </div>
         </Router>
       </Provider>

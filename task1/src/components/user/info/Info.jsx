@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useSelector } from 'react-redux';
+import { Link } from 'react-router-dom';
 
 import './info.scss';
 
 function Info(props) {
-    const { name, username, address, email, phone, website, company } = useSelector((state) => state.user);
+    const { id, name, username, address, email, phone, website, company } = useSelector((state) => state.user);
 
     return (
         <div className="info">
@@ -50,6 +51,7 @@ function Info(props) {
                     </div>
                 </div>
             </div>
+            <Link to={`/user/${id}/albums`}><div className="btn-show-albums">Show my albums</div></Link>
         </div>
     );
 }

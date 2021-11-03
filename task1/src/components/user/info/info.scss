@@ -2,6 +2,25 @@
     width: 75%;
     border: 1px solid orange;
     padding: 2rem;
+    .btn-show-albums {
+        font-size: 2rem;
+        text-align: center;
+        margin-top: 2rem;
+        color: gray;
+        opacity: 0.4;
+        cursor: pointer;
+        border: 1px solid gray;
+        padding: 5px;
+        transition-duration: .3s;
+        user-select: none;
+        &:hover {
+            opacity: 1;
+        }
+        &:active {
+            transition-duration: 0s;
+            opacity: 0.5;
+        }
+    }
 }
 
 .tabs {
