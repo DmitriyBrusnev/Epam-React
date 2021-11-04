@@ -7,7 +7,7 @@ import { useParams } from 'react-router';
 
 function Details(props) {
   const params = useParams();
-  console.log('params', params);
+  
   return (
     <div className="details">
         <Avatar />
