@@ -13,7 +13,6 @@ function Content(props) {
   const [ modalInfo, setModalInfo ] = useState({ isOpen: false, content: (<div></div>), title: 'Album', okHandler: () => { /** */ } });
 
   const urlParams = useParams();
-  console.log('params', urlParams);
 
   const dispatch = useDispatch();
   

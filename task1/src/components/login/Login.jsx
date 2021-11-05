@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Redirect } from "react-router";
+import { Redirect, Link } from "react-router-dom";
 import { getUsers, setActiveUser } from "../../redux/actions/user";
 
 import './login.scss';
@@ -19,15 +19,13 @@ function Login(props) {
     }, [dispatch]);
 
     if (userState.activeUser) {
-        console.log('active user login jsx', userState.activeUser);
         localStorage.setItem('login', JSON.stringify(true));
         return <Redirect to={`/user/${userState.activeUser.id}`} />
     }
 
-    if (userState.users.length !== 0) {
+    if (userState.users.length !== 0 && nameInput.current && passwordInput.current) {
         const user = userState.users.find((el) => el.name === nameInput.current.value && el.username === passwordInput.current.value);
         if (user) {
-            console.log('user', user);
             dispatch(setActiveUser(user));
         }
     }
@@ -50,6 +48,7 @@ function Login(props) {
                 </div>
 
                 <div className={ "btn-login" + (usersLoading ? " disable" : "") } onClick={ usersLoading ? () => { /** */ } : btnLoginHandler }>Login</div>
+                <Link className="btn-show-albums" to="/albums" >Show all albums</Link>
             </div>
         </div>
     )

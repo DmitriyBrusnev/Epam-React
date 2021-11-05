@@ -4,13 +4,10 @@ export const getUsers = () => {
     return (dispatch) => {
         dispatch(getUsersStarted());
 
-        console.log('start dispatch');
-
         fetch("https://jsonplaceholder.typicode.com/users")
             .then(res => res.json())
             .then(
                 (result) => {
-                    console.log(result);
                     dispatch(getUsersSuccess(result));
                 },
                 (error) => {
