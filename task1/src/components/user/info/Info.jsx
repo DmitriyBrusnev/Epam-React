@@ -1,11 +1,18 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useSelector } from 'react-redux';
-import { Link } from 'react-router-dom';
+import { Link, Redirect } from 'react-router-dom';
+import { checkIsLogin } from '../../../helpers/checkLogin';
 
 import './info.scss';
 
 function Info(props) {
-    const { id, name, username, address, email, phone, website, company } = useSelector((state) => state.user);
+    const userInfo = useSelector((state) => state.user);
+
+    if (!checkIsLogin() || !userInfo.activeUser) {
+        return <Redirect to="/login" />;
+    }
+    
+    const { id, name, username, address, email, phone, website, company } = userInfo.activeUser;
 
     return (
         <div className="info">

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import {
   BrowserRouter as Router,
   Route,
+  Switch,
 } from "react-router-dom";
 
 
@@ -13,6 +14,7 @@ import rootReducer from './redux/reducer/rootReducer';
 import thunk from 'redux-thunk';
 import { ErrorBoundary } from './components/error/ErrorBoundary.jsx';
 import Login from './components/login/Login';
+import { Logout } from './components/logout/Logout';
 
 const store = createStore(rootReducer, applyMiddleware(thunk));
 
@@ -22,9 +24,14 @@ function App(props) {
       <Provider store={ store }>
         <Router>
           <div className="container">
-            <Route path="/login" exact>
-              <Login />
-            </Route>
+            <Switch>
+              <Route path="/login" exact>
+                <Login />
+              </Route>
+              <Route path="/">
+                <Logout />
+              </Route>
+            </Switch>
             <Route path={['/user/:userId', '/', 'home', '/user/:userId/albums/:albumId', '/user/:userId/albums']} exact >
               <Details { ...props } />
             </Route>

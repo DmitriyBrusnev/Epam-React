@@ -1,4 +1,4 @@
-import { GET_USERS_FAILURE, GET_USERS_STARTED, GET_USERS_SUCCESS } from "../const/const";
+import { GET_USERS_FAILURE, GET_USERS_STARTED, GET_USERS_SUCCESS, SET_ACTIVE_USER } from "../const/const";
 
 export const getUsers = () => {
     return (dispatch) => {
@@ -10,6 +10,7 @@ export const getUsers = () => {
             .then(res => res.json())
             .then(
                 (result) => {
+                    console.log(result);
                     dispatch(getUsersSuccess(result));
                 },
                 (error) => {
@@ -35,7 +36,14 @@ const getUsersFailure = (error) => ({
     payload: error,
 })
 
-export const setActiveUser = (user) => ({
-    type: GET_USERS_FAILURE,
-    payload: user,
-})
+export const setActiveUser = (user) => {
+    if (user) {
+        localStorage.setItem('login', JSON.stringify(false));
+    } else {
+        localStorage.setItem('login', JSON.stringify(true));
+    }
+    return {
+        type: SET_ACTIVE_USER,
+        payload: user,
+    }
+};

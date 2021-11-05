@@ -29,7 +29,7 @@ const initialState = {
 };
 
 export default function userReducer(state = initialState, action) {
-    switch (action) {
+    switch (action.type) {
         // get albums reducers
         case GET_USERS_STARTED:
             return {
@@ -37,7 +37,6 @@ export default function userReducer(state = initialState, action) {
                 usersLoading: true,
             }
         case GET_USERS_SUCCESS:
-            console.log('action', action.payload);
             return {
                 ...state,
                 usersLoading: false,
