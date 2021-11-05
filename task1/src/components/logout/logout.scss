@@ -1,0 +1,13 @@
+.btn-logout {
+    font-size: 2rem;
+    text-align: center;
+    border: 1px solid rgb(216, 214, 214);
+    cursor: pointer;
+    width: 70%;
+    margin: 3rem auto;
+    color: rgb(173, 172, 172);
+    transition-duration: .3s;
+    &:hover {
+        opacity: .5;
+    }
+}
