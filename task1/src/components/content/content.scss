@@ -1,0 +1,13 @@
+.albums {
+    list-style: none;
+    .albums__item {
+        font-family: sans-serif;
+        font-size: 2.5rem;
+        border: 1px solid orange;
+        margin: 3px;
+        padding: 3px;
+        .album__title {
+            color: #bdbdbd;
+        }
+    }
+}
